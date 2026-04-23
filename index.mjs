@@ -8,12 +8,12 @@ app.use(express.urlencoded({extended:true}));
 
 //setting up database connection pool, replace values in red
 const pool = mysql.createPool({
-    host: "your_hostname",
-    user: "your_username",
-    password: "your_password",
-    database: "your_database",
-    connectionLimit: 10,
-    waitForConnections: true
+   host: "your_hostname",
+   user: "your_username",
+   password: "your_password",
+   database: "your_database",
+   connectionLimit: 10,
+   waitForConnections: true
 });
 
 //routes
