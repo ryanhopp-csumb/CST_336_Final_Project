@@ -4,8 +4,14 @@
     <%-include("partials/head.ejs")%>
 </head>
 <body>
-    <h1>BookNest: Search for a Book</h1>
 
-    
+    <%- include("partials/nav.ejs") %>
+    <div class="browsing">
+        <h1> Discover Your Next Great Read! </h1>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by title or author...">
+            <button onclick="searchBooks()">Search</button>
+        </div>
+    </div>
 </body>
 </html>
