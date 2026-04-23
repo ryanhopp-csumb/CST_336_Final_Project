@@ -31,6 +31,22 @@ app.get("/dbTest", async(req, res) => {
     }
 });
 
+// login page route 
+app.get('/login', (req, res) => {
+   res.render('login.ejs')
+});
+
+// signup page route 
+app.get('/signup', (req, res) => {
+   res.render('signup.ejs')
+});
+
+// checkout page route 
+app.get('/checkout', (req, res) => {
+   res.render('checkout.ejs')
+});
+
+
 //dbTest
 app.listen(3000, ()=>{
     console.log("Express server running")
