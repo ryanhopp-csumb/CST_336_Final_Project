@@ -7,8 +7,14 @@
     <%- include("partials/nav.ejs") %>
     <div class="loginSignUpDiv">
         <h1>Sign Up for a BookNest Account</h1>
-        Enter a username: <input type="text" id="signUpUame"> <br><br>
-        Enter a password: <input type="text" id="signUpPwd">
+        <form action="/signupForm" method="POST">
+            Enter your first name: <input type="text" id="signUpFirstName" name = "first_Name"> <br><br>
+            Enter your last name: <input type="text" id="signUpLastName" name = "Last_Name"> <br><br>
+            Enter a username: <input type="text" id="signUpuserName" name = "user_Name"> <br><br>
+            Enter a password: <input type="text" id="signUpPwd" name="password"> <br><br>
+            Enter your email: <input type="text" id="signUpEmail" name = "email"> <br><br>
+            <button> Sign Up! </button>
+        </form>
     </div>
 </body>
 </html>

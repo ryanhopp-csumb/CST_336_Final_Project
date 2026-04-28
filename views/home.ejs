@@ -4,7 +4,7 @@
     <%-include("partials/head.ejs")%>
 </head>
 <body>
-
+   
     <%- include("partials/nav.ejs") %>
     <div class="browsing">
         <h1> Discover Your Next Great Read! </h1>
@@ -12,6 +12,17 @@
             <input type="text" id="searchInput" placeholder="Search by title or author...">
             <button onclick="searchBooks()">Search</button>
         </div>
+            
+        <dialog id = "bookModal">
+            <div id="bookInfo">
+                <button id = "closeModal"> Close </button>
+                <h1 id = "authorName" ></h1>
+                <h1 id = "bookName" ></h1>
+                <img id = "bookImage" width = "300">
+                <h2 id = "bookSummary" ></h2>
+                <img id = "authoImage" width = "100"> 
+            </div>
+        </dialog>
     </div>
 </body>
 </html>
