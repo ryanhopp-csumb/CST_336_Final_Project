@@ -5,7 +5,66 @@
 </head>
 <body>
     <%- include("partials/nav.ejs") %>
-    <h1>Shopping Cart</h1>
-    
+
+    <main class="cart-page">
+        <h1>Shopping Cart</h1>
+
+        <div class="cart-container">
+
+            <!-- CART ITEMS -->
+            <div class="cart-items">
+
+                <% if (cart && cart.length > 0) { %>
+
+                    <% cart.forEach(item => { %>
+                        <div class="cart-item">
+
+                            <div class="cart-book-image">
+                                <!-- optional image -->
+                                <% if (item.image) { %>
+                                    <img src="<%= item.image %>" alt="Book Cover">
+                                <% } %>
+                            </div>
+
+                            <div class="cart-book-details">
+                                <h2><%= item.title %></h2>
+                                <p><%= item.author %></p>
+                                <p>$<%= item.price %></p>
+                            </div>
+
+                        </div>
+                    <% }) %>
+
+                <% } else { %>
+
+                    <p>Your cart is empty.</p>
+
+                <% } %>
+
+            </div>
+
+            <!-- ORDER SUMMARY -->
+            <div class="cart-summary">
+
+                <%
+                let total = 0;
+                if (cart) {
+                    cart.forEach(item => {
+                        total += item.price;
+                    });
+                }
+                %>
+
+                <h2>Order Summary</h2>
+                <p>Subtotal: $<%= total.toFixed(2) %></p>
+                <p>Total: $<%= total.toFixed(2) %></p>
+
+                <a href="/pay" class="primary-btn">Proceed to Pay</a>
+
+            </div>
+
+        </div>
+    </main>
+
 </body>
 </html>
