@@ -1,5 +1,6 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
+import bcrypt from 'bcrypt';
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -9,8 +10,8 @@ app.use(express.urlencoded({extended:true}));
 //setting up database connection pool, replace values in red
 const pool = mysql.createPool({
    host: "hngomrlb3vfq3jcr.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
-   user: process.env.DB_UNAME,
-   password: process.env.DB_PWD,
+   user: "aa3dyc0mw8c8zb5t",
+   password: "qd0qhbuo6ce2ccpz",
    database: "bao4zpfnzi38d977",
    connectionLimit: 10,
    waitForConnections: true
@@ -36,14 +37,32 @@ app.get('/login', (req, res) => {
    res.render('login.ejs')
 });
 
+// signup success page route 
+app.get('/signupSuccess', (req, res) => {
+   res.render('signupSuccess.ejs')
+});
+
 // signup page route 
 app.get('/signup', (req, res) => {
    res.render('signup.ejs')
 });
 
+// adding the new profile info (from the signup form) to our database
+app.post('/signupForm', async (req, res) => {
+    let {first_Name, Last_Name, user_Name, password, email} = req.body;
+    let password_hashed = await bcrypt.hash(password, 11); // hashes the password. 11 is for 2^11 operations a hacker would have to do to get the password. we can adjust from 10-12.
+    let sql = `INSERT INTO users
+               (first_Name, Last_Name, user_Name, email, password_hashed)
+               VALUES (?, ?, ?, ?, ?)`;
+    let sqlParams = [first_Name, Last_Name, user_Name, email, password_hashed];
+    const[rows] = await pool.query(sql, sqlParams);
+
+    res.redirect('/signupSuccess');
+})
+
 // checkout page route 
-app.get('/checkout', (req, res) => {
-   res.render('checkout.ejs')
+app.get('/pay', (req, res) => {
+   res.render('pay.ejs')
 });
 
 
