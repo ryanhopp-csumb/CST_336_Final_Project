@@ -3,9 +3,31 @@ import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 const app = express();
 let cart = [
-    { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
-    { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
+    {
+        title: "The Midnight Garden",
+        author: "Sarah Mitchell",
+        price: 24.99,
+        quantity: 1,
+        image: ""
+    },
+    {
+        title: "Echoes of the Past",
+        author: "William Harrison",
+        price: 19.99,
+        quantity: 2,
+        image: ""
+    }
 ];
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
+app.post('/cart/remove', (req, res) => {
+   const { title } = req.body;
+   cart = cart.filter(item => item.title !== title);
+   res.redirect('/cart');
+});
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 //for Express to get values using the POST method
@@ -63,9 +85,7 @@ app.post('/signupForm', async (req, res) => {
 
     res.redirect('/signupSuccess');
 })
-app.get('/cart', (req, res) => {
-   res.render('cart.ejs', { cart });
-});
+
 // checkout page route 
 app.get('/pay', (req, res) => {
    res.render('pay.ejs')
