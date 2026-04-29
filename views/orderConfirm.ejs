@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head.ejs") %>
+</head>
+<body>
+    <h1>Order Confirmed</h1>
+
+  <p>Thank you, <%= fullName %>! Your order has been placed successfully.</p>
+
+  <h2>Order Summary</h2>
+
+  <% cart.forEach(item => { %>
+    <div>
+      <h3><%= item.title %></h3>
+      <p>Author: <%= item.author %></p>
+      <p>Price: $<%= item.price.toFixed(2) %></p>
+      <p>Quantity: <%= item.quantity %></p>
+      <p>Subtotal: $<%= (item.price * item.quantity).toFixed(2) %></p>
+    </div>
+  <% }) %>
+
+  <h2>Total Paid: $<%= total.toFixed(2) %></h2>
+
+  <p>Your order has been placed.</p>
+
+  <a href="/">Return Home</a>
+</body>
+</html>
