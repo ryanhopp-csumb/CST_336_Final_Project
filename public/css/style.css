@@ -58,3 +58,19 @@ body{
     border: 1px solid #ccc;
     border-radius: 25px;
 }
+#bookList {
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+.bookElement {
+    background-color: rgb(117, 201, 197);
+    flex-direction: column;
+    padding-left: 3ch;
+    padding-right: 3ch;
+    padding-bottom: 2ch;
+    border-radius: 15px;
+}

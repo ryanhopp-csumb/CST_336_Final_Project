@@ -31,9 +31,10 @@ app.get('/', async(req, res) => {
          throw new Error("There was an error accessing the API");
       }
       const data = await response.json();
-      console.log(data);
-
-      res.render('home.ejs');
+      //console.log(data);
+      let homeData = data.items;
+      console.log(homeData);
+      res.render('home.ejs', {homeData});
    } catch (err) {
       if (err instanceof TypeError) {
          res.render('home.ejs', { message: 'There was an error accessing the API (network failure)' });

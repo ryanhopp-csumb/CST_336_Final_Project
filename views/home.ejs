@@ -12,17 +12,33 @@
             <input type="text" id="searchInput" placeholder="Search by title or author...">
             <button onclick="searchBooks()">Search</button>
         </div>
-            
+
+        <br>
+        <ul id="bookList">
+            <% for (let i of homeData) {%>
+                <br>
+                <li class="bookElement">
+                    <h1 class = "bookName"><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h1>
+                    <h1 class = "authorName">By <%=i.volumeInfo.authors%></h1>
+                    <img class = "bookImage" width = "200" src="<%=i.volumeInfo.imageLinks.smallThumbnail%>">
+                </li>
+                <br>
+            <%}%>
+        </ul>
+
         <dialog id = "bookModal">
-            <div id="bookInfo">
-                <button id = "closeModal"> Close </button>
-                <h1 id = "authorName" ></h1>
-                <h1 id = "bookName" ></h1>
-                <img id = "bookImage" width = "300">
-                <h2 id = "bookSummary" ></h2>
-                <img id = "authoImage" width = "100"> 
-            </div>
+            <% for (let i of homeData) {%>
+                <div id="bookInfo">
+                    <button id = "closeModal"> Close </button>
+                    <h1 class = "authorName" ><%=i.volumeInfo.authors%></h1>
+                    <h1 class = "bookName" ><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h1>
+                    <img class = "bookImage" width = "300" src="<%=i.volumeInfo.imageLinks.thumbnail%>">
+                    <h2 id = "bookSummary" ><%=i.volumeInfo.description%></h2>
+                    <img id = "authorImage" width = "100"> <%#I don't think we have this%>
+                </div>
+            <%}%>
         </dialog>
     </div>
+
 </body>
 </html>
