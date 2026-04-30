@@ -22,8 +22,25 @@ const pool = mysql.createPool({
 });
 
 //routes
-app.get('/', (req, res) => {
-   res.render('home.ejs')
+app.get('/', async(req, res) => {
+   let url = 'https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
+
+   try {
+      const response = await fetch(url);
+      if (!response.ok) {
+         throw new Error("There was an error accessing the API");
+      }
+      const data = await response.json();
+      console.log(data);
+
+      res.render('home.ejs');
+   } catch (err) {
+      if (err instanceof TypeError) {
+         res.render('home.ejs', { message: 'There was an error accessing the API (network failure)' });
+      } else {
+         res.render('Error', { message: "Couldn't load the books"});
+      }
+   }
 });
 
 app.get("/dbTest", async(req, res) => {
