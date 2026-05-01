@@ -61,16 +61,22 @@ body{
 #bookList {
     list-style-type: none;
     display: flex;
-    flex-wrap: wrap;
-    text-align: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     justify-content: center;
 }
 .bookElement {
-    background-color: rgb(117, 201, 197);
-    flex-direction: column;
+    background-color: rgb(83, 184, 204);
+    padding-top: 3ch;
     padding-left: 3ch;
     padding-right: 3ch;
-    padding-bottom: 2ch;
+    padding-bottom: 3ch;
     border-radius: 15px;
+}
+.bookImage {
+    float: left;
+    padding-right: 3ch;
+}
+#bookRow {
+    text-align: start;
 }

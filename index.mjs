@@ -31,9 +31,7 @@ app.get('/', async(req, res) => {
          throw new Error("There was an error accessing the API");
       }
       const data = await response.json();
-      //console.log(data);
       let homeData = data.items;
-      console.log(homeData);
       res.render('home.ejs', {homeData});
    } catch (err) {
       if (err instanceof TypeError) {
@@ -80,15 +78,16 @@ app.post('/signupForm', async (req, res) => {
     const[rows] = await pool.query(sql, sqlParams);
 
     res.redirect('/signupSuccess');
-})
+});
+
 app.get('/cart', (req, res) => {
    res.render('cart.ejs', { cart });
 });
+
 // checkout page route 
 app.get('/pay', (req, res) => {
    res.render('pay.ejs')
 });
-
 
 //dbTest
 app.listen(3000, ()=>{

@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <%-include("partials/head.ejs")%>
+    <script src="/js/script.js" defer></script>
 </head>
 <body>
    
     <%- include("partials/nav.ejs") %>
     <div class="browsing">
+        <br>
         <h1> Discover Your Next Great Read! </h1>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Search by title or author...">
@@ -14,30 +16,30 @@
         </div>
 
         <br>
+        <br>
+        <br>
         <ul id="bookList">
             <% for (let i of homeData) {%>
-                <br>
                 <li class="bookElement">
-                    <h1 class = "bookName"><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h1>
-                    <h1 class = "authorName">By <%=i.volumeInfo.authors%></h1>
-                    <img class = "bookImage" width = "200" src="<%=i.volumeInfo.imageLinks.smallThumbnail%>">
+                    <img class = "bookImage" width = "150" src="<%=i.volumeInfo.imageLinks.smallThumbnail%>">
+                    <div id = "bookRow">
+                        <h2 class = "bookName"><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h2>
+                        <h2 class = "authorName">By <%=i.volumeInfo.authors%></h2>
+                    </div>
                 </li>
                 <br>
+                <dialog id = "bookModal">
+                    <div id="bookInfo">
+                        <button id = "closeModal"> Close </button>
+                        <h2 class = "authorName" ><%=i.volumeInfo.authors%></h2>
+                        <h2 class = "bookName" ><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h2>
+                        <img class = "bookImage" width = "300" src="<%=i.volumeInfo.imageLinks.thumbnail%>">
+                        <h3 id = "bookSummary" ><%=i.volumeInfo.description%></h3>
+                        <img id = "authorImage" width = "100"> <%#I don't think we have this%>
+                    </div>
+                </dialog>
             <%}%>
         </ul>
-
-        <dialog id = "bookModal">
-            <% for (let i of homeData) {%>
-                <div id="bookInfo">
-                    <button id = "closeModal"> Close </button>
-                    <h1 class = "authorName" ><%=i.volumeInfo.authors%></h1>
-                    <h1 class = "bookName" ><%=i.volumeInfo.title%><br><%=i.volumeInfo.subtitle%></h1>
-                    <img class = "bookImage" width = "300" src="<%=i.volumeInfo.imageLinks.thumbnail%>">
-                    <h2 id = "bookSummary" ><%=i.volumeInfo.description%></h2>
-                    <img id = "authorImage" width = "100"> <%#I don't think we have this%>
-                </div>
-            <%}%>
-        </dialog>
     </div>
 
 </body>
