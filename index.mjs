@@ -88,7 +88,26 @@ app.post('/signupForm', async (req, res) => {
 
 // checkout page route 
 app.get('/pay', (req, res) => {
-   res.render('pay.ejs')
+  const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   res.render('pay.ejs', { cart, total });
+});
+
+// Order Confirm page route
+app.post('/place-order', (req, res) => {
+   const { fullName, address, cardNumber, expiryDate, cvv } = req.body;
+
+   const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   res.render('orderConfirm.ejs', {
+      fullName,
+      total,
+      cart
+   });
 });
 
 
