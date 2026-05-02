@@ -3,8 +3,8 @@ import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 const app = express();
 let cart = [
-    { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
-    { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
+   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
+   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
 ];
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -44,12 +44,12 @@ app.get('/', async(req, res) => {
 
 app.get("/dbTest", async(req, res) => {
    try {
-        const [rows] = await pool.query("SELECT CURDATE()");
-        res.send(rows);
-    } catch (err) {
-        console.error("Database error:", err);
-        res.status(500).send("Database error!");
-    }
+      const [rows] = await pool.query("SELECT CURDATE()");
+      res.send(rows);
+   } catch (err) {
+      console.error("Database error:", err);
+      res.status(500).send("Database error!");
+   }
 });
 
 // login page route 
@@ -91,5 +91,5 @@ app.get('/pay', (req, res) => {
 
 //dbTest
 app.listen(3000, ()=>{
-    console.log("Express server running")
+   console.log("Express server running")
 })

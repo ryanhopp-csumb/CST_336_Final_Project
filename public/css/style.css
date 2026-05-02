@@ -49,7 +49,6 @@ body{
 }
 .search-bar button {
     background-color: antiquewhite;
-    color:darkkhaki;
     cursor: pointer;
 }
 .search-bar input {
@@ -77,6 +76,15 @@ body{
     float: left;
     padding-right: 3ch;
 }
-#bookRow {
+.bookRow {
     text-align: start;
+}
+.closeModal {
+    background-color: antiquewhite;
+}
+.showBookInfo {
+    background-color: antiquewhite;
+}
+.addToCart {
+    background-color: antiquewhite;
 }
