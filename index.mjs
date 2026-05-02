@@ -6,6 +6,16 @@ let cart = [
    { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
    { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
 ];
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
+app.post('/cart/remove', (req, res) => {
+   const { title } = req.body;
+   cart = cart.filter(item => item.title !== title);
+   res.redirect('/cart');
+});
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 //for Express to get values using the POST method
@@ -86,7 +96,26 @@ app.get('/cart', (req, res) => {
 
 // checkout page route 
 app.get('/pay', (req, res) => {
-   res.render('pay.ejs')
+  const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   res.render('pay.ejs', { cart, total });
+});
+
+// Order Confirm page route
+app.post('/place-order', (req, res) => {
+   const { fullName, address, cardNumber, expiryDate, cvv } = req.body;
+
+   const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   res.render('orderConfirm.ejs', {
+      fullName,
+      total,
+      cart
+   });
 });
 
 //dbTest
