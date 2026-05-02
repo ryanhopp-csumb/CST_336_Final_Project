@@ -32,24 +32,24 @@
                             <h2 class="authorName">By <%=i.volumeInfo.authors%>
                             </h2>
                             <button class="showBookInfo" data-target="<%=i.id%>">Show More Info</button>
-                            <dialog class="bookModal" id="<%=i.id%>">
-                                <div class="bookInfo">
-                                    <button class="closeModal" data-target="<%=i.id%>">Close</button>
-                                    <button class="addToCart">Add Book to Cart</button>
-                                    <h2 class="authorName">
-                                        <%=i.volumeInfo.authors%>
-                                    </h2>
-                                    <h2 class="bookName">
-                                        <%=i.volumeInfo.title%><br>
-                                        <%=i.volumeInfo.subtitle%>
-                                    </h2>
-                                    <img class="bookImage" width="250" src="<%=i.volumeInfo.imageLinks.thumbnail%>">
-                                    <h3 class="bookSummary">
-                                        <%=i.volumeInfo.description%>
-                                    </h3>
-                                </div>
-                            </dialog>
                         </div>
+                        <dialog class="bookModal" id="<%=i.id%>">
+                            <div class="bookInfo">
+                                <button class="closeModal" data-target="<%=i.id%>">Close</button>
+                                <button class="addToCart">Add Book to Cart</button>
+                                <h2 class="authorName">
+                                    <%=i.volumeInfo.authors%>
+                                </h2>
+                                <h2 class="bookName">
+                                    <%=i.volumeInfo.title%><br>
+                                    <%=i.volumeInfo.subtitle%>
+                                </h2>
+                                <img class="bookImage" width="250" src="<%=i.volumeInfo.imageLinks.thumbnail%>">
+                                <h3 class="bookSummary">
+                                    <%=i.volumeInfo.description%>
+                                </h3>
+                            </div>
+                        </dialog>
                     </li>
                     <br>
                 <%}%>
