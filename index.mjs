@@ -64,7 +64,29 @@ app.get("/dbTest", async(req, res) => {
 
 // login page route 
 app.get('/login', (req, res) => {
-   res.render('login.ejs')
+   res.render('login.ejs', {error: false})
+});
+
+//login form info checking with databse
+app.post('/loginForm', async(req, res) => {
+   let {user_Name, password} = req.body;
+   let sql = `SELECT *
+              FROM users
+              WHERE user_Name = ?`
+   const[rows] = await pool.query(sql, [user_Name]);
+   if (rows.length === 0) {
+      return res.render('login.ejs', {error: true});
+   }
+   const passMatch = await bcrypt.compare(password, rows[0].password_hashed);
+   if (!passMatch) {
+      return res.render('login.ejs', {error: true});
+   }
+   res.redirect('/loginSuccess');
+})
+
+// login success page route 
+app.get('/loginSuccess', (req, res) => {
+   res.render('loginSuccess.ejs')
 });
 
 // signup success page route 
