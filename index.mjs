@@ -3,20 +3,8 @@ import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 const app = express();
 let cart = [
-    {
-        title: "The Midnight Garden",
-        author: "Sarah Mitchell",
-        price: 24.99,
-        quantity: 1,
-        image: ""
-    },
-    {
-        title: "Echoes of the Past",
-        author: "William Harrison",
-        price: 19.99,
-        quantity: 2,
-        image: ""
-    }
+   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
+   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
 ];
 
 app.get('/cart', (req, res) => {
@@ -44,18 +32,34 @@ const pool = mysql.createPool({
 });
 
 //routes
-app.get('/', (req, res) => {
-   res.render('home.ejs')
+app.get('/', async(req, res) => {
+   let url = 'https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
+
+   try {
+      const response = await fetch(url);
+      if (!response.ok) {
+         throw new Error("There was an error accessing the API");
+      }
+      const data = await response.json();
+      let homeData = data.items;
+      res.render('home.ejs', {homeData});
+   } catch (err) {
+      if (err instanceof TypeError) {
+         res.render('home.ejs', { message: 'There was an error accessing the API (network failure)' });
+      } else {
+         res.render('Error', { message: "Couldn't load the books"});
+      }
+   }
 });
 
 app.get("/dbTest", async(req, res) => {
    try {
-        const [rows] = await pool.query("SELECT CURDATE()");
-        res.send(rows);
-    } catch (err) {
-        console.error("Database error:", err);
-        res.status(500).send("Database error!");
-    }
+      const [rows] = await pool.query("SELECT CURDATE()");
+      res.send(rows);
+   } catch (err) {
+      console.error("Database error:", err);
+      res.status(500).send("Database error!");
+   }
 });
 
 // login page route 
@@ -106,7 +110,11 @@ app.post('/signupForm', async (req, res) => {
     const[rows] = await pool.query(sql, sqlParams);
 
     res.redirect('/signupSuccess');
-})
+});
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
 
 // checkout page route 
 app.get('/pay', (req, res) => {
@@ -132,8 +140,7 @@ app.post('/place-order', (req, res) => {
    });
 });
 
-
 //dbTest
 app.listen(3000, ()=>{
-    console.log("Express server running")
+   console.log("Express server running")
 })
