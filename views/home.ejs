@@ -36,7 +36,9 @@
                         <dialog class="bookModal" id="<%=i.id%>">
                             <div class="bookInfo">
                                 <button class="closeModal" data-target="<%=i.id%>">Close</button>
-                                <button class="addToCart">Add Book to Cart</button>
+                                <form action="/addedToCart">
+                                    <button class="addToCart">Add Book to Cart</button>
+                                </form>
                                 <h2 class="authorName">
                                     <%=i.volumeInfo.authors%>
                                 </h2>

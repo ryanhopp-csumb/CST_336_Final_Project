@@ -90,6 +90,10 @@ app.post('/signupForm', async (req, res) => {
     res.redirect('/signupSuccess');
 });
 
+app.get('/addedToCart', (req, res) => {
+   res.render('addedToCart.ejs');
+});
+
 app.get('/cart', (req, res) => {
    res.render('cart.ejs', { cart });
 });
