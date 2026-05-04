@@ -11,7 +11,7 @@
     <%- include("partials/nav.ejs") %>
         <div class="browsing">
             <br>
-            <h1> Discover Your Next Great Read! </h1>
+            <h1> Discover Your Next Great Read<% if (user_Name) { %>, <%= user_Name %>!<% } else { %>!<% } %></h1>
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search by title or author...">
                 <button onclick="searchBooks()">Search</button>
