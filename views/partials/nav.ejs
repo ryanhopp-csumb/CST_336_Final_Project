@@ -1,8 +1,12 @@
 <nav class = "navbar">
     <div class="nav-left">
-        <a href = "/login">Login</a>
-        <a href = "/signup">Signup</a>
-    </div>
+    <% if (user_Name) { %>
+        <a href="/logout">Logout</a>
+    <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
+    <% } %>
+</div>
     <div class="nav-center">
         <span class = "nav-logo"> 📖 BookNest 📖 </span>
     </div>
