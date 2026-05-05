@@ -23,6 +23,9 @@
                             <div class="bookInfo">
                                 <button class="closeModal" data-target="<%=i.id%>">Close</button>
                                 <form action="/addedToCart" method="POST">
+                                    <input type="hidden" name="title" value="<%= i.volumeInfo.title %>">
+                                    <input type="hidden" name="author" value="<%= i.volumeInfo.authors %>">
+                                    <input type="hidden" name="image" value="<%= i.volumeInfo.imageLinks.thumbnail %>">
                                     <button class="addToCart">Add Book to Cart</button>
                                 </form>
                                 <h2 class="authorName">
