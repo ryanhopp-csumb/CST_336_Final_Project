@@ -41,10 +41,7 @@ const pool = mysql.createPool({
    waitForConnections: true
 });
 
-let cart = [
-   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
-   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
-];
+let cart = [];
 //routes
 app.get('/', async(req, res) => {
    let url = 'https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=10&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
@@ -145,12 +142,20 @@ app.get('/searchResults', async (req, res) => {
    }
 });
 
-app.post('/addedToCart', (req, res) => {
-   const {title, author} = req.body;
+app.post('/addedToCart', async(req, res) => {
+   const {title, author, image} = req.body;
+// incrementing the quantity of a book if added to cart multiple times
+   const existing = cart.find(item => item.title === title);
+   if (existing) {
+      existing.quantity = (existing.quantity || 1) + 1;
+   } else {
+      cart.push({
+      title, author, price: 9.99, image, quantity: 1 });
+   }
    let sql = `INSERT INTO books
-               (title, author)
-               VALUES(?, ?)`
-   let sqlParams = [title, author];
+               (title, author, price)
+               VALUES(?, ?, ?)`
+   await pool.query(sql, [title, author, 9.99]);
    res.render('addedToCart.ejs');
 });
 
