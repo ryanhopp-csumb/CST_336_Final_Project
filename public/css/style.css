@@ -49,7 +49,6 @@ body{
 }
 .search-bar button {
     background-color: antiquewhite;
-    color:darkkhaki;
     cursor: pointer;
 }
 .search-bar input {
@@ -57,6 +56,26 @@ body{
     padding: 12px 20px;
     border: 1px solid #ccc;
     border-radius: 25px;
+}
+
+#bookList {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+}
+.bookElement {
+    background-color: rgb(83, 184, 204);
+    padding-top: 3ch;
+    padding-left: 3ch;
+    padding-right: 3ch;
+    padding-bottom: 3ch;
+    border-radius: 15px;
+}
+.bookImage {
+    float: left;
+    padding-right: 3ch;
 }
 .cart-page {
     width: 90%;
@@ -168,3 +187,6 @@ body{
     border-radius: 8px;
     cursor: pointer;
 } 
+main {
+    text-align: center;
+}

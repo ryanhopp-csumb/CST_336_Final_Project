@@ -1,37 +1,35 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
+import session from 'express-session';
 const app = express();
-let cart = [
-    {
-        title: "The Midnight Garden",
-        author: "Sarah Mitchell",
-        price: 24.99,
-        quantity: 1,
-        image: ""
-    },
-    {
-        title: "Echoes of the Past",
-        author: "William Harrison",
-        price: 19.99,
-        quantity: 2,
-        image: ""
-    }
-];
 
-app.get('/cart', (req, res) => {
-   res.render('cart.ejs', { cart });
-});
-
-app.post('/cart/remove', (req, res) => {
-   const { title } = req.body;
-   cart = cart.filter(item => item.title !== title);
-   res.redirect('/cart');
-});
+//middleware info & function
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 //for Express to get values using the POST method
 app.use(express.urlencoded({extended:true}));
+
+//setting up sessions
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+}))
+
+//adding the middleware function used by all routes
+app.use((req, res, next) => {
+  res.locals.user_Name = req.session.user_Name || "";
+  next();
+});
+function isUserAuthenticated(req, res, next) {
+   if (req.session.authenticated) {
+      next();
+   } else {
+      res.redirect('/login');
+   }
+}
 
 //setting up database connection pool, replace values in red
 const pool = mysql.createPool({
@@ -43,24 +41,69 @@ const pool = mysql.createPool({
    waitForConnections: true
 });
 
+let cart = [
+   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
+   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
+];
 //routes
-app.get('/', (req, res) => {
-   res.render('home.ejs')
+app.get('/', async(req, res) => {
+   let url = 'https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=10&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
+
+   try {
+      const response = await fetch(url);
+      if (!response.ok) {
+         throw new Error("There was an error accessing the API");
+      }
+      const data = await response.json();
+      let homeData = data.items;
+      res.render('home.ejs', {homeData});
+   } catch (err) {
+      if (err instanceof TypeError) {
+         res.render('home.ejs', { message: 'There was an error accessing the API (network failure)', homeData: []  });
+      } else {
+         res.render('Error', { message: "Couldn't load the books", homeData: []});
+      }
+   }
 });
 
-app.get("/dbTest", async(req, res) => {
-   try {
-        const [rows] = await pool.query("SELECT CURDATE()");
-        res.send(rows);
-    } catch (err) {
-        console.error("Database error:", err);
-        res.status(500).send("Database error!");
-    }
+app.get('/cart', isUserAuthenticated, (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
+app.post('/cart/remove', isUserAuthenticated, (req, res) => {
+   const { title } = req.body;
+   cart = cart.filter(item => item.title !== title);
+   res.redirect('/cart');
 });
 
 // login page route 
 app.get('/login', (req, res) => {
-   res.render('login.ejs')
+   res.render('login.ejs', {error: false})
+});
+
+//login form info checking with databse
+app.post('/loginForm', async(req, res) => {
+   let {user_Name, password} = req.body;
+   let sql = `SELECT *
+              FROM users
+              WHERE user_Name = ?`
+   const[rows] = await pool.query(sql, [user_Name]);
+   if (rows.length === 0) {
+      return res.render('login.ejs', {error: true});
+   }
+   const passMatch = await bcrypt.compare(password, rows[0].password_hashed);
+   if (!passMatch) {
+      return res.render('login.ejs', {error: true});
+   }
+   // starting the session if login is successful
+   req.session.authenticated = true;
+   req.session.user_Name = rows[0].user_Name;
+   res.redirect('/loginSuccess');
+})
+
+// login success page route 
+app.get('/loginSuccess', (req, res) => {
+   res.render('loginSuccess.ejs')
 });
 
 // signup success page route 
@@ -82,40 +125,51 @@ app.post('/signupForm', async (req, res) => {
                VALUES (?, ?, ?, ?, ?)`;
     let sqlParams = [first_Name, Last_Name, user_Name, email, password_hashed];
     const[rows] = await pool.query(sql, sqlParams);
-
+    //starting the session
+    req.session.authenticated = true;
+    req.session.user_Name = user_Name;
     res.redirect('/signupSuccess');
-})
+});
+
+app.get('/searchResults', async (req, res) => {
+   let query = req.query.searchTitle;
+   let url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo`;
+
+   try {
+      const response = await fetch(url);
+      const data = await response.json();
+      let searchData = data.items || [];
+      res.render('searchResults.ejs', { searchData, query});
+   } catch (err) {
+      res.render('searchResults.ejs', { searchData: [], query: ''});
+   }
+});
+
+app.post('/addedToCart', (req, res) => {
+   let title; //= req.body.
+   let author; //= req.body.
+   let sql = `INSERT INTO books
+               (title, author)
+               VALUES(?, ?)`
+   let sqlParams = [title, author];
+   res.render('addedToCart.ejs');
+});
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
 
 // checkout page route 
-app.get('/pay', (req, res) => {
-   res.render('pay.ejs')
-});
-app.post('/submitOrder', async (req, res) => {
-   const { customerName, email, address, cardLastFour } = req.body;
+app.get('/pay', isUserAuthenticated, (req, res) => {
+  const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
 
-   let total = 0;
-   cart.forEach(item => {
-      total += item.price * (item.quantity || 1);
-   });
-
-   let sql = `INSERT INTO orders
-              (customer_name, email, address, card_last_four, total_price)
-              VALUES (?, ?, ?, ?, ?)`;
-
-   let sqlParams = [customerName, email, address, cardLastFour, total];
-
-   await pool.query(sql, sqlParams);
-
-   cart = [];
-
-   res.redirect('/orderConfirmation');
+   res.render('pay.ejs', { cart, total });
 });
 
-app.get('/orderConfirmation', (req, res) => {
-   res.render('orderConfirmation.ejs');
-});
 
 //dbTest
 app.listen(3000, ()=>{
-    console.log("Express server running")
+   console.log("Express server running")
 })
