@@ -168,26 +168,24 @@ app.get('/pay', isUserAuthenticated, (req, res) => {
    res.render('pay.ejs', { cart, total });
 });
 app.post('/submitOrder', isUserAuthenticated, async (req, res) => {
-   const { customerName, email, address, cardLastFour } = req.body;
+   let total = 0;
+   let totalQuantity = 0;
 
-   const total = cart.reduce((sum, item) => {
-      return sum + (item.price * item.quantity);
-   }, 0);
+   for (let item of cart) {
+      total += item.price * item.quantity;
+      totalQuantity += item.quantity;
+   }
 
    const sql = `INSERT INTO orders
-                (customer_name, email, address, card_last_four, total_price)
-                VALUES (?, ?, ?, ?, ?)`;
+                (user_Name, quantity, total_price)
+                VALUES (?, ?, ?)`;
 
-   await pool.query(sql, [customerName, email, address, cardLastFour, total]);
+   await pool.query(sql, [req.session.user_Name, totalQuantity, total]);
 
    const orderedCart = [...cart];
    cart = [];
 
-   res.render('orderConfirmation.ejs', {
-      fullName: customerName,
-      cart: orderedCart,
-      total
-   });
+   res.render('orderConfirmation.ejs', { fullName: req.session.user_Name, cart: orderedCart, total });
 });
 
 //profile route and update profile route
