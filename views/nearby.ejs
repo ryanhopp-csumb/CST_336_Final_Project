@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Nearby Libraries & Bookstores</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <%- include("partials/head.ejs") %>
+
+        <style>
+            #map {
+                height: 500px;
+                width: 100%;
+            }
+        </style>
+</head>
+
+<body class="bg-light">
+
+    <%- include("partials/nav.ejs") %>
+
+        <div class="container py-4">
+
+            <div class="mb-4">
+                <h1 class="fw-bold">📚 Find Nearby Libraries & Bookstores</h1>
+                <button id="findPlacesBtn" class="btn btn-primary mt-2">
+                    Use My Location
+                </button>
+            </div>
+
+            <div id="map" class="rounded shadow mb-4"></div>
+
+            <h2 class="mb-3">Nearby Libraries & Bookstores</h2>
+
+            <div id="results" class="row g-3">
+                <p class="text-muted">Click the button to find places near you.</p>
+            </div>
+
+        </div>
+
+        <script>
+            let map;
+
+            function getDistanceMiles(lat1, lng1, lat2, lng2) {
+                const R = 3958.8;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) *
+                    Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return (R * c).toFixed(1);
+            }
+
+            document.getElementById("findPlacesBtn").addEventListener("click", () => {
+                if (!navigator.geolocation) {
+                    alert("Geolocation is not supported.");
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    map = new google.maps.Map(document.getElementById("map"), {
+                        center: userLocation,
+                        zoom: 14
+                    });
+
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: "You are here"
+                    });
+
+                    const resultsDiv = document.getElementById("results");
+
+                    resultsDiv.innerHTML = `
+               <div class="text-center">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2">Loading nearby places...</p>
+               </div>
+            `;
+
+                    const response = await fetch(`/nearby-books?lat=${userLocation.lat}&lng=${userLocation.lng}`);
+                    const data = await response.json();
+
+                    resultsDiv.innerHTML = "";
+
+                    if (!data.places || data.places.length === 0) {
+                        resultsDiv.innerHTML = "<p class='text-muted'>No places found.</p>";
+                        return;
+                    }
+
+                    data.places.forEach(place => {
+                        const placeLocation = {
+                            lat: place.location.latitude,
+                            lng: place.location.longitude
+                        };
+
+                        const distance = getDistanceMiles(
+                            userLocation.lat,
+                            userLocation.lng,
+                            placeLocation.lat,
+                            placeLocation.lng
+                        );
+
+                        new google.maps.Marker({
+                            position: placeLocation,
+                            map: map,
+                            title: place.displayName.text
+                        });
+
+                        resultsDiv.innerHTML += `
+                  <div class="col-md-6 col-lg-4">
+                     <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                           <h5 class="card-title">${place.displayName.text}</h5>
+                           <p class="card-text">${place.formattedAddress || "No address listed"}</p>
+                           <p class="text-muted">📍 ${distance} miles away</p>
+                           <p class="text-warning">⭐ ${place.rating || "N/A"}</p>
+                        </div>
+                     </div>
+                  </div>
+               `;
+                    });
+
+                }, () => {
+                    alert("Location permission denied.");
+                });
+            });
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBd5RO2VGyud4IWv8S0tEiOh404XyAHBSk" async defer>
+        </script>
+
+</body>
+
+</html>

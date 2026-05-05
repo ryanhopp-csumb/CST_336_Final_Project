@@ -2,9 +2,12 @@
     <div class="nav-left">
     <% if (user_Name) { %>
         <a href="/logout">Logout</a>
+        <a class="nav-link" href="/profile">Profile</a>
+        <a href="/nearby">Nearby Libraries & Bookstores</a>
     <% } else { %>
         <a href="/login">Login</a>
         <a href="/signup">Signup</a>
+        <a href="/nearby">Nearby Libraries & Bookstores</a>
     <% } %>
     </div>
     <div class="nav-center">
