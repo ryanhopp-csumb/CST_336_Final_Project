@@ -66,6 +66,7 @@ app.get('/', async(req, res) => {
    }
 });
 
+
 app.get('/cart', isUserAuthenticated, (req, res) => {
    res.render('cart.ejs', { cart });
 });
@@ -169,6 +170,96 @@ app.get("/dbTest", async(req, res) => {
       res.status(500).send("Database error!");
    }
 });
+
+//profile route and update profile route
+app.get('/profile', isUserAuthenticated, async (req, res) => {
+   const sql = `SELECT first_Name, Last_Name, user_Name, email
+                FROM users
+                WHERE user_Name = ?`;
+
+   const [rows] = await pool.query(sql, [req.session.user_Name]);
+
+   if (rows.length === 0) {
+      return res.redirect('/login');
+   }
+
+   res.render('profile.ejs', { user: rows[0], message: null });
+});
+
+app.post('/profile/update', isUserAuthenticated, async (req, res) => {
+   const { first_Name, Last_Name, user_Name, email } = req.body;
+
+   const sql = `UPDATE users
+                SET first_Name = ?, Last_Name = ?, user_Name = ?, email = ?
+                WHERE user_Name = ?`;
+
+   await pool.query(sql, [
+      first_Name,
+      Last_Name,
+      user_Name,
+      email,
+      req.session.user_Name
+   ]);
+
+   req.session.user_Name = user_Name;
+
+   const updatedUser = {
+      first_Name,
+      Last_Name,
+      user_Name,
+      email
+   };
+
+   res.render('profile.ejs', {
+      user: updatedUser,
+      message: "Profile updated successfully!"
+   });
+});
+
+// Google maps Api
+app.get('/nearby', (req, res) => {
+   res.render('nearby.ejs');
+});
+
+app.get('/nearby-books', async (req, res) => {
+   try {
+      const { lat, lng } = req.query;
+
+      if (!lat || !lng) {
+         return res.status(400).json({ error: "Missing lat or lng" });
+      }
+
+      const response = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': 'AIzaSyBqSVR_ln9qdxvCFnxg4l7FfdPFrUHoC94',
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.rating'
+         },
+         body: JSON.stringify({
+            includedTypes: ['library', 'book_store'],
+            maxResultCount: 10,
+            locationRestriction: {
+               circle: {
+                  center: {
+                     latitude: Number(lat),
+                     longitude: Number(lng)
+                  },
+                  radius: 5000
+               }
+            }
+         })
+      });
+
+      const data = await response.json();
+      res.json(data);
+
+   } catch (err) {
+      console.error("Google Places error:", err);
+      res.status(500).json({ error: "Could not fetch nearby places" });
+   }
+});
+
 
 //dbTest
 app.listen(3000, ()=>{
