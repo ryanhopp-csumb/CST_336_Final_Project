@@ -47,7 +47,7 @@ let cart = [
 ];
 //routes
 app.get('/', async(req, res) => {
-   let url = 'https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
+   let url = 'https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=10&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
 
    try {
       const response = await fetch(url);
@@ -131,8 +131,18 @@ app.post('/signupForm', async (req, res) => {
     res.redirect('/signupSuccess');
 });
 
-app.get('/searchResults', (req, res) => {
-   res.render('searchResults.ejs');
+app.get('/searchResults', async (req, res) => {
+   let query = req.query.searchTitle;
+   let url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo`;
+
+   try {
+      const response = await fetch(url);
+      const data = await response.json();
+      let searchData = data.items || [];
+      res.render('searchResults.ejs', { searchData, query});
+   } catch (err) {
+      res.render('searchResults.ejs', { searchData: [], query: ''});
+   }
 });
 
 app.post('/addedToCart', (req, res) => {
