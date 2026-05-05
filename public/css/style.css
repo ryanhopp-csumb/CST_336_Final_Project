@@ -187,3 +187,58 @@ body{
     border-radius: 8px;
     cursor: pointer;
 } 
+.profile-wrapper {
+    width: 90%;
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.profile-card {
+    background-color: rgb(83, 184, 204);
+    padding: 3ch;
+    border-radius: 15px;
+}
+
+.profile-field {
+    margin-bottom: 18px;
+}
+
+.profile-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.profile-field input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.profile-field input:focus {
+    outline: none;
+    border-color: #2c7a7a;
+}
+
+.profile-btn {
+    margin-top: 10px;
+    background-color: antiquewhite;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.profile-btn:hover {
+    background-color: rgb(83, 184, 204);
+}
+
+.profile-alert {
+    background-color: #d4edda;
+    border: 1px solid #7cc47c;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 18px;
+    color: #1a4a1a;
+}
