@@ -244,3 +244,8 @@ main {
     margin-bottom: 18px;
     color: #1a4a1a;
 }
+
+#map {
+    height: 500px;
+    width: 100%;
+}
