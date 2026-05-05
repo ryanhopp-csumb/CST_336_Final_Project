@@ -13,8 +13,10 @@
             <br>
             <h1> Discover Your Next Great Read<% if (user_Name) { %>, <%= user_Name %>!<% } else { %>!<% } %></h1>
             <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search by title or author...">
-                <button onclick="searchBooks()">Search</button>
+                <form action="/searchResults">
+                    <input type="text" id="searchInput" placeholder="Search by title or author...">
+                    <button id="searchBtn" onclick="searchBooks()">Search</button>
+                </form>
             </div>
 
             <br>
@@ -36,7 +38,9 @@
                         <dialog class="bookModal" id="<%=i.id%>">
                             <div class="bookInfo">
                                 <button class="closeModal" data-target="<%=i.id%>">Close</button>
-                                <button class="addToCart">Add Book to Cart</button>
+                                <form action="/addedToCart" method="POST">
+                                    <button class="addToCart">Add Book to Cart</button>
+                                </form>
                                 <h2 class="authorName">
                                     <%=i.volumeInfo.authors%>
                                 </h2>

@@ -3,11 +3,6 @@
 
 let bookModal = document.querySelector(".bookModal");
 
-// let bookRows = document.querySelectorAll(".bookRow");
-// for (const bookRow of bookRows) {
-//     bookRow.addEventListener("click", bookModal.showModal);
-// }
-
 let closeBtns = document.querySelectorAll(".closeModal");
 closeBtns.forEach(button => {
     button.addEventListener('click', () => {
@@ -16,7 +11,6 @@ closeBtns.forEach(button => {
     if (modal) modal.close()
   })
 })
-
 
 const t = document.querySelectorAll(".showBookInfo");
 t.forEach(button => {
@@ -27,4 +21,9 @@ t.forEach(button => {
   })
 })
 
-let addBtn = document.querySelector(".addToCart");
+//let addBtn = document.querySelector(".addToCart");
+
+function searchBooks() {
+  let searchBtn = document.querySelector("#searchBtn");
+  
+}
