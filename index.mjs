@@ -130,6 +130,25 @@ app.post('/signupForm', async (req, res) => {
     req.session.user_Name = user_Name;
     res.redirect('/signupSuccess');
 });
+
+app.get('/searchResults', (req, res) => {
+   res.render('searchResults.ejs');
+});
+
+app.post('/addedToCart', (req, res) => {
+   let title; //= req.body.
+   let author; //= req.body.
+   let sql = `INSERT INTO books
+               (title, author)
+               VALUES(?, ?)`
+   let sqlParams = [title, author];
+   res.render('addedToCart.ejs');
+});
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
 // checkout page route 
 app.get('/pay', isUserAuthenticated, (req, res) => {
   const total = cart.reduce((sum, item) => {
