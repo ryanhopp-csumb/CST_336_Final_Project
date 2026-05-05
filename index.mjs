@@ -90,7 +90,30 @@ app.post('/signupForm', async (req, res) => {
 app.get('/pay', (req, res) => {
    res.render('pay.ejs')
 });
+app.post('/submitOrder', async (req, res) => {
+   const { customerName, email, address, cardLastFour } = req.body;
 
+   let total = 0;
+   cart.forEach(item => {
+      total += item.price * (item.quantity || 1);
+   });
+
+   let sql = `INSERT INTO orders
+              (customer_name, email, address, card_last_four, total_price)
+              VALUES (?, ?, ?, ?, ?)`;
+
+   let sqlParams = [customerName, email, address, cardLastFour, total];
+
+   await pool.query(sql, sqlParams);
+
+   cart = [];
+
+   res.redirect('/orderConfirmation');
+});
+
+app.get('/orderConfirmation', (req, res) => {
+   res.render('orderConfirmation.ejs');
+});
 
 //dbTest
 app.listen(3000, ()=>{

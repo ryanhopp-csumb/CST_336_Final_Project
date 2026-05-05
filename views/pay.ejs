@@ -5,8 +5,25 @@
 </head>
 <body>
     <%- include("partials/nav.ejs") %>
-    <h1>Checkout</h1>
 
-    
+    <main class="checkout-page">
+        <h1>Checkout</h1>
+
+        <form action="/submitOrder" method="POST" class="checkout-form">
+            <label for="customerName">Full Name</label>
+            <input type="text" id="customerName" name="customerName" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="address">Shipping Address</label>
+            <input type="text" id="address" name="address" required>
+
+            <label for="cardLastFour">Last 4 Digits of Card</label>
+            <input type="text" id="cardLastFour" name="cardLastFour" maxlength="4" required>
+
+            <button type="submit" class="primary-btn">Place Order</button>
+        </form>
+    </main>
 </body>
 </html>
