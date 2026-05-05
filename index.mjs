@@ -1,25 +1,35 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
+import session from 'express-session';
 const app = express();
-let cart = [
-   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
-   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
-];
 
-app.get('/cart', (req, res) => {
-   res.render('cart.ejs', { cart });
-});
-
-app.post('/cart/remove', (req, res) => {
-   const { title } = req.body;
-   cart = cart.filter(item => item.title !== title);
-   res.redirect('/cart');
-});
+//middleware info & function
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 //for Express to get values using the POST method
 app.use(express.urlencoded({extended:true}));
+
+//setting up sessions
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+}))
+
+//adding the middleware function used by all routes
+app.use((req, res, next) => {
+  res.locals.user_Name = req.session.user_Name || "";
+  next();
+});
+function isUserAuthenticated(req, res, next) {
+   if (req.session.authenticated) {
+      next();
+   } else {
+      res.redirect('/login');
+   }
+}
 
 //setting up database connection pool, replace values in red
 const pool = mysql.createPool({
@@ -31,6 +41,10 @@ const pool = mysql.createPool({
    waitForConnections: true
 });
 
+let cart = [
+   { title: "The Midnight Garden", author: "Sarah Mitchell", price: 24.99 },
+   { title: "Echoes of the Past", author: "William Harrison", price: 19.99 }
+];
 //routes
 app.get('/', async(req, res) => {
    let url = 'https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
@@ -45,26 +59,51 @@ app.get('/', async(req, res) => {
       res.render('home.ejs', {homeData});
    } catch (err) {
       if (err instanceof TypeError) {
-         res.render('home.ejs', { message: 'There was an error accessing the API (network failure)' });
+         res.render('home.ejs', { message: 'There was an error accessing the API (network failure)', homeData: []  });
       } else {
-         res.render('Error', { message: "Couldn't load the books"});
+         res.render('Error', { message: "Couldn't load the books", homeData: []});
       }
    }
 });
 
-app.get("/dbTest", async(req, res) => {
-   try {
-      const [rows] = await pool.query("SELECT CURDATE()");
-      res.send(rows);
-   } catch (err) {
-      console.error("Database error:", err);
-      res.status(500).send("Database error!");
-   }
+app.get('/cart', isUserAuthenticated, (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
+app.post('/cart/remove', isUserAuthenticated, (req, res) => {
+   const { title } = req.body;
+   cart = cart.filter(item => item.title !== title);
+   res.redirect('/cart');
 });
 
 // login page route 
 app.get('/login', (req, res) => {
-   res.render('login.ejs')
+   res.render('login.ejs', {error: false})
+});
+
+//login form info checking with databse
+app.post('/loginForm', async(req, res) => {
+   let {user_Name, password} = req.body;
+   let sql = `SELECT *
+              FROM users
+              WHERE user_Name = ?`
+   const[rows] = await pool.query(sql, [user_Name]);
+   if (rows.length === 0) {
+      return res.render('login.ejs', {error: true});
+   }
+   const passMatch = await bcrypt.compare(password, rows[0].password_hashed);
+   if (!passMatch) {
+      return res.render('login.ejs', {error: true});
+   }
+   // starting the session if login is successful
+   req.session.authenticated = true;
+   req.session.user_Name = rows[0].user_Name;
+   res.redirect('/loginSuccess');
+})
+
+// login success page route 
+app.get('/loginSuccess', (req, res) => {
+   res.render('loginSuccess.ejs')
 });
 
 // signup success page route 
@@ -86,7 +125,9 @@ app.post('/signupForm', async (req, res) => {
                VALUES (?, ?, ?, ?, ?)`;
     let sqlParams = [first_Name, Last_Name, user_Name, email, password_hashed];
     const[rows] = await pool.query(sql, sqlParams);
-
+    //starting the session
+    req.session.authenticated = true;
+    req.session.user_Name = user_Name;
     res.redirect('/signupSuccess');
 });
 
@@ -109,7 +150,7 @@ app.get('/cart', (req, res) => {
 });
 
 // checkout page route 
-app.get('/pay', (req, res) => {
+app.get('/pay', isUserAuthenticated, (req, res) => {
   const total = cart.reduce((sum, item) => {
       return sum + (item.price * item.quantity);
    }, 0);
@@ -130,6 +171,22 @@ app.post('/place-order', (req, res) => {
       total,
       cart
    });
+});
+
+// logout route
+app.get('/logout', (req, res) => {
+   req.session.destroy();
+   res.redirect('/');
+})
+
+app.get("/dbTest", async(req, res) => {
+   try {
+      const [rows] = await pool.query("SELECT CURDATE()");
+      res.send(rows);
+   } catch (err) {
+      console.error("Database error:", err);
+      res.status(500).send("Database error!");
+   }
 });
 
 //dbTest

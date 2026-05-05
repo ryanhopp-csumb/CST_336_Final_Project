@@ -8,9 +8,21 @@
 
     <div class="loginSignUpDiv">
         <h1>Login</h1>
-        Username: <input type="text" id="uName"> <br><br>
-        Password: <input type="text" id="pwd"> 
+        <% if (error) { %>
+            <div class = "errorMessage">
+                <p> Those credentials were not found in our database. Would you like to create an account?</p>
+                <a href = "/signup"><button> Sign me up for an account! </button></a>
+                <a href = "/login"><button> Try logging in again! </button></a>
+            </div>
+        <% } %>
+        <br> <br>
+        <form action="/loginForm" method = "POST">
+            Username: <input type="text" name="user_Name" id="uName"> <br><br>
+            Password: <input type="password" name= "password" id="pwd">
+            <br><br>
+            <button type = "submit">  Log in! </button>
+        </form>
     </div>
-
+    <%- include("partials/footer.ejs") %>
 </body>
 </html>
