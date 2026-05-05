@@ -292,8 +292,7 @@ app.get('/searchResults', async (req, res) => {
 });
 
 app.post('/addedToCart', (req, res) => {
-   let title; //= req.body.
-   let author; //= req.body.
+   const {title, author} = req.body;
    let sql = `INSERT INTO books
                (title, author)
                VALUES(?, ?)`
