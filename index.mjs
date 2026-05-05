@@ -90,7 +90,17 @@ app.post('/signupForm', async (req, res) => {
     res.redirect('/signupSuccess');
 });
 
-app.get('/addedToCart', (req, res) => {
+app.get('/searchResults', (req, res) => {
+   res.render('searchResults.ejs');
+});
+
+app.post('/addedToCart', (req, res) => {
+   let title; //= req.body.
+   let author; //= req.body.
+   let sql = `INSERT INTO books
+               (title, author)
+               VALUES(?, ?)`
+   let sqlParams = [title, author];
    res.render('addedToCart.ejs');
 });
 
