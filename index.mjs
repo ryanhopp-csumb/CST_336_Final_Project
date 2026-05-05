@@ -51,6 +51,8 @@ let cart = [
 app.get("/", async (req, res) => {
   let url =
     "https://www.googleapis.com/books/v1/volumes?q=SEARCH_TERM&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo";
+app.get('/', async(req, res) => {
+   let url = 'https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=10&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo';
 
   try {
     const response = await fetch(url);
@@ -267,6 +269,51 @@ app.get("/nearby-books", async (req, res) => {
     res.status(500).json({ error: "Could not fetch nearby places" });
   }
 });
+    let sqlParams = [first_Name, Last_Name, user_Name, email, password_hashed];
+    const[rows] = await pool.query(sql, sqlParams);
+    //starting the session
+    req.session.authenticated = true;
+    req.session.user_Name = user_Name;
+    res.redirect('/signupSuccess');
+});
+
+app.get('/searchResults', async (req, res) => {
+   let query = req.query.searchTitle;
+   let url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyBh_tUuyGb8X7GrGSwOty0IP3VVB_WCABo`;
+
+   try {
+      const response = await fetch(url);
+      const data = await response.json();
+      let searchData = data.items || [];
+      res.render('searchResults.ejs', { searchData, query});
+   } catch (err) {
+      res.render('searchResults.ejs', { searchData: [], query: ''});
+   }
+});
+
+app.post('/addedToCart', (req, res) => {
+   let title; //= req.body.
+   let author; //= req.body.
+   let sql = `INSERT INTO books
+               (title, author)
+               VALUES(?, ?)`
+   let sqlParams = [title, author];
+   res.render('addedToCart.ejs');
+});
+
+app.get('/cart', (req, res) => {
+   res.render('cart.ejs', { cart });
+});
+
+// checkout page route 
+app.get('/pay', isUserAuthenticated, (req, res) => {
+  const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   res.render('pay.ejs', { cart, total });
+});
+
 
 //dbTest
 app.listen(3000, () => {
