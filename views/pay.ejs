@@ -9,6 +9,22 @@
     <main class="checkout-page">
         <h1>Checkout</h1>
 
+        <div class="cart-summary">
+            <h2>Order Summary</h2>
+
+            <% let total = 0; %>
+
+            <% cart.forEach(item => { %>
+                <p>
+                    <%= item.title %> (x<%= item.quantity %>) - 
+                    $<%= (item.price * item.quantity).toFixed(2) %>
+                </p>
+                <% total += item.price * item.quantity; %>
+            <% }) %>
+
+            <h3>Total: $<%= total.toFixed(2) %></h3>
+        </div>
+
         <form action="/submitOrder" method="POST" class="checkout-form">
 
             <label>Full Name</label>
@@ -23,7 +39,9 @@
             <label>Last 4 Digits of Card</label>
             <input type="text" name="cardLastFour" maxlength="4" required>
 
-            <button type="submit" class="primary-btn">Place Order</button>
+            <button type="submit" class="primary-btn">
+                Place Order
+            </button>
 
         </form>
     </main>

@@ -63,10 +63,6 @@ app.get('/', async(req, res) => {
    }
 });
 
-app.get('/cart', isUserAuthenticated, (req, res) => {
-   res.render('cart.ejs', { cart });
-});
-
 app.post('/cart/remove', isUserAuthenticated, (req, res) => {
    const { title } = req.body;
    cart = cart.filter(item => item.title !== title);
@@ -170,6 +166,28 @@ app.get('/pay', isUserAuthenticated, (req, res) => {
    }, 0);
 
    res.render('pay.ejs', { cart, total });
+});
+app.post('/submitOrder', isUserAuthenticated, async (req, res) => {
+   const { customerName, email, address, cardLastFour } = req.body;
+
+   const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+   }, 0);
+
+   const sql = `INSERT INTO orders
+                (customer_name, email, address, card_last_four, total_price)
+                VALUES (?, ?, ?, ?, ?)`;
+
+   await pool.query(sql, [customerName, email, address, cardLastFour, total]);
+
+   const orderedCart = [...cart];
+   cart = [];
+
+   res.render('orderConfirmation.ejs', {
+      fullName: customerName,
+      cart: orderedCart,
+      total
+   });
 });
 
 //profile route and update profile route
